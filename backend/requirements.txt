@@ -9,4 +9,8 @@ python-dotenv
 python-multipart
 requests
 torch==2.2.2+cpu
+<<<<<<< HEAD
 transformers==4.41.2
+=======
+transformers==4.41.2
+>>>>>>> 7085f5f (.)
