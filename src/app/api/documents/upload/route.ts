@@ -21,6 +21,7 @@ export async function POST(request: NextRequest) {
       method: 'POST',
       body: outboundFormData,
       cache: 'no-store',
+      signal: AbortSignal.timeout(300000),
     })
 
     const data = await response.json()
