@@ -3,9 +3,9 @@ import asyncio
 from fastapi import APIRouter
 from pydantic import BaseModel
 
-from backend.services.embedder import embed_text
-from backend.services.llm import chat_completion
-from backend.services.mongo import vector_search_chunks
+from services.embedder import embed_text
+from services.llm import chat_completion
+from services.mongo import vector_search_chunks
 
 router = APIRouter()
 

@@ -4,9 +4,9 @@ import uuid
 import fitz
 from fastapi import APIRouter, File, HTTPException, UploadFile
 
-from backend.services.chunker import chunk_text, clean_text
-from backend.services.embedder import embed_texts
-from backend.services.mongo import insert_chunks, insert_document, now_iso
+from services.chunker import chunk_text, clean_text
+from services.embedder import embed_texts
+from services.mongo import insert_chunks, insert_document, now_iso
 
 router = APIRouter()
 

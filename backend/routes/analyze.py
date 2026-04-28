@@ -5,7 +5,7 @@ import re
 from fastapi import APIRouter
 from pydantic import BaseModel
 
-from backend.services.llm import chat_completion
+from services.llm import chat_completion
 
 router = APIRouter()
 

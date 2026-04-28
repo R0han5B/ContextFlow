@@ -2,7 +2,7 @@ import asyncio
 
 from fastapi import APIRouter, HTTPException
 
-from backend.services.mongo import delete_all_documents_and_chunks, delete_document, list_documents
+from services.mongo import delete_all_documents_and_chunks, delete_document, list_documents
 
 router = APIRouter()
 
