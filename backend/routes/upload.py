@@ -49,7 +49,7 @@ async def upload_document(file: UploadFile = File(...)):
         if not chunks:
             raise HTTPException(status_code=400, detail="Unable to create chunks from file")
 
-        embeddings = await asyncio.to_thread(embed_text, chunks)
+        embeddings = [await asyncio.to_thread(embed_text, chunk) for chunk in chunks]
         document_id = uuid.uuid4().hex
 
         document_record = {
