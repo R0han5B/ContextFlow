@@ -5,7 +5,7 @@ import fitz
 from fastapi import APIRouter, File, HTTPException, UploadFile
 
 from services.chunker import chunk_text, clean_text
-from services.embedder import embed_texts
+from services.embedder import embed_text
 from services.mongo import insert_chunks, insert_document, now_iso
 
 router = APIRouter()
@@ -49,7 +49,7 @@ async def upload_document(file: UploadFile = File(...)):
         if not chunks:
             raise HTTPException(status_code=400, detail="Unable to create chunks from file")
 
-        embeddings = await asyncio.to_thread(embed_texts, chunks)
+        embeddings = [await asyncio.to_thread(embed_text, chunk) for chunk in chunks]
         document_id = uuid.uuid4().hex
 
         document_record = {
