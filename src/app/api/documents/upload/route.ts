@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getBackendBaseUrl } from '@/lib/backend-config'
 
 export const runtime = 'nodejs'
-const LOCAL_BACKEND_URL = 'http://localhost:8000'
 
 export async function POST(request: NextRequest) {
   try {
@@ -29,18 +28,6 @@ export async function POST(request: NextRequest) {
       cache: 'no-store',
       signal: AbortSignal.timeout(300000),
     })
-
-    if (response.status === 404 && backendUrl !== LOCAL_BACKEND_URL) {
-      const fallbackResponse = await fetch(`${LOCAL_BACKEND_URL}/upload`, {
-        method: 'POST',
-        body: outboundFormData,
-        cache: 'no-store',
-        signal: AbortSignal.timeout(300000),
-      })
-
-      const fallbackData = await fallbackResponse.json()
-      return NextResponse.json(fallbackData, { status: fallbackResponse.status })
-    }
 
     const responseText = await response.text()
     console.log('Backend upload status:', response.status)
