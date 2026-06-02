@@ -49,7 +49,7 @@ async def upload_document(file: UploadFile = File(...)):
         if not chunks:
             raise HTTPException(status_code=400, detail="Unable to create chunks from file")
 
-        embeddings = [await asyncio.to_thread(embed_text, chunk) for chunk in chunks]
+        embeddings = await asyncio.to_thread(embed_text, chunks)
         document_id = uuid.uuid4().hex
 
         document_record = {
@@ -87,4 +87,5 @@ async def upload_document(file: UploadFile = File(...)):
     except HTTPException:
         raise
     except Exception as error:
+        print(f"Upload error: {error}")
         raise HTTPException(status_code=500, detail=f"Failed to process file: {error}") from error

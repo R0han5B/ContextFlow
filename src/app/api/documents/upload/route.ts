@@ -2,9 +2,15 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getBackendBaseUrl } from '@/lib/backend-config'
 
 export const runtime = 'nodejs'
+const LOCAL_BACKEND_URL = 'http://localhost:8000'
 
 export async function POST(request: NextRequest) {
   try {
+    const backendUrl = getBackendBaseUrl()
+    console.log('Backend URL:', backendUrl)
+    console.log('NEXT_PUBLIC_PYTHON_BACKEND_URL env:', process.env.NEXT_PUBLIC_PYTHON_BACKEND_URL)
+    console.log('PYTHON_BACKEND_URL env:', process.env.PYTHON_BACKEND_URL)
+
     const incomingFormData = await request.formData()
     const file = incomingFormData.get('file')
 
@@ -17,14 +23,36 @@ export async function POST(request: NextRequest) {
     const blob = new Blob([buffer], { type: file.type || 'application/octet-stream' })
     outboundFormData.append('file', blob, file.name)
 
-    const response = await fetch(`${getBackendBaseUrl()}/upload`, {
+    const response = await fetch(`${backendUrl}/upload`, {
       method: 'POST',
       body: outboundFormData,
       cache: 'no-store',
       signal: AbortSignal.timeout(300000),
     })
 
-    const data = await response.json()
+    if (response.status === 404 && backendUrl !== LOCAL_BACKEND_URL) {
+      const fallbackResponse = await fetch(`${LOCAL_BACKEND_URL}/upload`, {
+        method: 'POST',
+        body: outboundFormData,
+        cache: 'no-store',
+        signal: AbortSignal.timeout(300000),
+      })
+
+      const fallbackData = await fallbackResponse.json()
+      return NextResponse.json(fallbackData, { status: fallbackResponse.status })
+    }
+
+    const responseText = await response.text()
+    console.log('Backend upload status:', response.status)
+    console.log('Backend upload body:', responseText)
+
+    let data
+    try {
+      data = responseText ? JSON.parse(responseText) : {}
+    } catch {
+      data = { detail: responseText || 'Upload failed' }
+    }
+
     return NextResponse.json(data, { status: response.status })
   } catch (error) {
     console.error('Proxy error in /api/documents/upload:', error)
