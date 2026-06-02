@@ -1,20 +1,17 @@
-from sentence_transformers import SentenceTransformer
+import requests
+import os
 
-# Load model once at startup, not on first request.
-print("Loading embedding model...")
-model = SentenceTransformer('all-MiniLM-L6-v2')
-print("Embedding model loaded successfully")
-
+HF_API_URL = "https://api-inference.huggingface.co/pipeline/feature-extraction/sentence-transformers/all-MiniLM-L6-v2"
+HF_TOKEN = os.getenv("HF_TOKEN", "")
 
 def embed_text(text: str) -> list[float]:
-    embedding = model.encode(text, convert_to_numpy=True)
-    return embedding.tolist()
-
-
-def embed_texts(texts: list[str]) -> list[list[float]]:
-    """Generate embeddings for a batch of texts using the preloaded model."""
-    if not texts:
-        return []
-
-    embeddings = model.encode(texts, convert_to_numpy=True)
-    return embeddings.tolist()
+    headers = {"Authorization": f"Bearer {HF_TOKEN}"} if HF_TOKEN else {}
+    response = requests.post(
+        HF_API_URL,
+        headers=headers,
+        json={"inputs": text, "options": {"wait_for_model": True}}
+    )
+    result = response.json()
+    if isinstance(result[0], list):
+        return result[0]
+    return result
